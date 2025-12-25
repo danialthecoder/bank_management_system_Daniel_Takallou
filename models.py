@@ -1,7 +1,4 @@
-'''
-Class --> vasl bshe b sootone databaset
-
-'''
+# SQLAlchemy models: Customer, Account, Transaction
 
 
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
@@ -34,7 +31,10 @@ class Customer(Base):
     id = Column(Integer, primary_key=True)
     name= Column(String, nullable=False)
     email= Column(String, unique=True)
-
+    age= Column(Integer, nullable=False)
+    phone= Column(String, nullable=False)
+    address= Column(String, nullable=False)
+    
     accounts= relationship("Account", back_populates="customer")
 
 
@@ -44,9 +44,10 @@ class Customer(Base):
 class Account(Base):
     __tablename__ = "accounts"
     id = Column(Integer, primary_key=True)
-    balance= Column(Float, default=0.0) #mojodi , 00
+    balance= Column(Float, default=0.0, default=0.0, nullable=False ) #mojodi , 00
     type = Column(String, default="standard") # 'standard', 'foreign', 'crypto'
     pin = Column(String, nullable=False) #pin kodom account ro khod kon
+    card_number = Column(String, unique=True, nullable=False)
     customer_id= Column(Integer, ForeignKey("customers.id"))
     
     #-------relationships-----
@@ -56,3 +57,12 @@ class Account(Base):
 
 
 #-------Transactions------
+class Transaction(Base):
+    __tablename__= "transactions"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
+    amount = Column(Float, nullable=False)
+    type = Column(String, nullable=False) # deposit, withdraw, transfer_in, transfer_out
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    account = relationship("Account", back_populates="transactions")
